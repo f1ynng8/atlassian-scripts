@@ -1,7 +1,3 @@
-/**
-  This code runs in Jira Automation Script Runner
-*/
-
 import com.atlassian.jira.component.ComponentAccessor
 import com.atlassian.jira.issue.Issue
 import com.atlassian.jira.issue.IssueManager
@@ -13,7 +9,6 @@ import com.atlassian.jira.issue.MutableIssue
 import com.atlassian.jira.bc.issue.IssueService
 import com.atlassian.jira.issue.IssueInputParametersImpl
 
-//def currentUser = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser()
 def issueManager = ComponentAccessor.issueManager
 //def issue = issueManager.getIssueObject(event.issue.key)
 IssueService issueService = ComponentAccessor.getIssueService()
@@ -22,25 +17,31 @@ def transitionValidationResult
 def transitionResult
 def customFieldManager = ComponentAccessor.getCustomFieldManager()
 def issue1 = issueManager.getIssueObject("NGP-273")
-log.debug("The issue type is: " + issue.getIssueType().name)
 
 def systemUser = ComponentAccessor.userManager.getUserByName("system")
 
 
-if (issue1.getIssueType().name == "Bug") {
- 
- transitionValidationResult = issueService.validateTransition(systemUser, issue1.id, actionId,new IssueInputParametersImpl())
-
- if (transitionValidationResult.isValid()) {
- transitionResult = issueService.transition(systemUser, transitionValidationResult)
- if (transitionResult.isValid())
- { log.debug("Transitioned issue $issue through action $actionId") }
- else
- { log.debug("Transition result is not valid") }
- }
- else {
- log.debug("The transitionValidation is not valid")
- }
+if (issue1.getIssueType().name == "Bug") 
+{ 
+	transitionValidationResult = issueService.validateTransition(systemUser, issue1.id, actionId,new IssueInputParametersImpl())
+	if (transitionValidationResult.isValid()) {
+		transitionResult = issueService.transition(systemUser, transitionValidationResult)
+ 		if (transitionResult.isValid()) { 
+        	log.debug("Transitioned issue $issue through action $actionId") 
+        }
+ 		else {
+        	log.debug("Transition result is not valid") 
+        }
+    }
+ 	else {
+ 		log.debug("The transitionValidation is not valid")
+ 	}
 }
+
+
+
+
+
+
 
 
