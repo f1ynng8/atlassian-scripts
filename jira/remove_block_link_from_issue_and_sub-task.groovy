@@ -45,7 +45,6 @@ issueLinkManager.getOutwardLinks(issue.getId()).each {eachLink ->
 
     }
 }
-
 //第2步: 如果当前issue存在sub-task, 则遍历每个sub-task
 //每个sub-task的处理流程与第1步中处理单个issue相同
 issueLinkManager.getOutwardLinks(issue.getId()).each {eachSubtaskLink ->
@@ -79,3 +78,28 @@ issueLinkManager.getOutwardLinks(issue.getId()).each {eachSubtaskLink ->
         }
     }
 }
+//第3步：如果当前issue是sub-task, 还是检查一下父issue是否满足transition的条件
+Issue parentIssue = issue.getParentObject()
+log.warn("Parent: " + parentIssue.getSummary())
+String parentIssueStatus = parentIssue.getStatus().getName()
+if (parentIssueStatus == "正在开发处理" || parentIssueStatus == "等待开发处理"){
+    if (parentIssue.getIssueType().name == "Story") {
+        transitionValidationResult = issueService.validateTransition(systemUser, parentIssue.id, bugActionId, new IssueInputParametersImpl())
+    } else if (parentIssue.getIssueType().name == "Bug") {
+        transitionValidationResult = issueService.validateTransition(systemUser, parentIssue.id, storyActionId, new IssueInputParametersImpl())
+    }
+
+    if (transitionValidationResult.isValid()) {
+        transitionResult = issueService.transition(systemUser, transitionValidationResult)
+        if (!transitionResult.isValid()) { 
+            log.warn("Transition result is not valid") 
+        }
+    } else {
+        log.warn("transitionValidationResul is not valid") 
+    }
+}
+
+ 
+
+
+
