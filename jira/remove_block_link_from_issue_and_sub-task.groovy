@@ -13,7 +13,7 @@ def transitionValidationResult
 def transitionResult
 def customFieldManager = ComponentAccessor.getCustomFieldManager()
 def systemUser = ComponentAccessor.userManager.getUserByName("system")
-//def issue = issueManager.getIssueObject("NGP-231")
+def issue = issueManager.getIssueObject("NGP-284")
 
 //第1步: 不论当前issue是什么类型，先处理当前issue的outward block链接 
 //检查当前issue的outward block链接的目标issue
@@ -79,27 +79,33 @@ issueLinkManager.getOutwardLinks(issue.getId()).each {eachSubtaskLink ->
     }
 }
 //第3步：如果当前issue是sub-task, 还是检查一下父issue是否满足transition的条件
-Issue parentIssue = issue.getParentObject()
-log.warn("Parent: " + parentIssue.getSummary())
-String parentIssueStatus = parentIssue.getStatus().getName()
-if (parentIssueStatus == "正在开发处理" || parentIssueStatus == "等待开发处理"){
-    if (parentIssue.getIssueType().name == "Story") {
-        transitionValidationResult = issueService.validateTransition(systemUser, parentIssue.id, bugActionId, new IssueInputParametersImpl())
-    } else if (parentIssue.getIssueType().name == "Bug") {
-        transitionValidationResult = issueService.validateTransition(systemUser, parentIssue.id, storyActionId, new IssueInputParametersImpl())
-    }
+issueLinkManager.getInwardLinks(issue.getId()).each {eachSubtaskLink ->
+    if (eachSubtaskLink.getIssueLinkType().getName() == "jira_subtask_link") {
+        Issue parentIssue = issue.getParentObject()
+        log.warn("Parent: " + parentIssue.getSummary())
+        issueLinkManager.removeIssueLink(eachSubtaskLink,systemUser)
+        String parentIssueStatus = parentIssue.getStatus().getName()
+        if (parentIssueStatus == "正在开发处理" || parentIssueStatus == "等待开发处理"){
+            if (parentIssue.getIssueType().name == "Story") {
+                transitionValidationResult = issueService.validateTransition(systemUser, parentIssue.id, bugActionId, new IssueInputParametersImpl())
+            } else if (parentIssue.getIssueType().name == "Bug") {
+                transitionValidationResult = issueService.validateTransition(systemUser, parentIssue.id, storyActionId, new IssueInputParametersImpl())
+            }
 
-    if (transitionValidationResult.isValid()) {
-        transitionResult = issueService.transition(systemUser, transitionValidationResult)
-        if (!transitionResult.isValid()) { 
-            log.warn("Transition result is not valid") 
+            if (transitionValidationResult.isValid()) {
+                transitionResult = issueService.transition(systemUser, transitionValidationResult)
+                if (!transitionResult.isValid()) { 
+                    log.warn("Transition result is not valid") 
+                }
+            } else {
+                log.warn("transitionValidationResul is not valid") 
+            }
         }
-    } else {
-        log.warn("transitionValidationResul is not valid") 
     }
 }
 
- 
 
+
+ 
 
 
