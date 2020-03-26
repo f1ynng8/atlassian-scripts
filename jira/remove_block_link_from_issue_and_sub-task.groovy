@@ -1,11 +1,6 @@
 import com.atlassian.jira.component.ComponentAccessor
 import com.atlassian.jira.issue.Issue
 import com.atlassian.jira.issue.IssueManager
-import com.atlassian.jira.project.Project
-import com.atlassian.jira.project.version.Version
-import com.atlassian.jira.project.version.VersionManager
-import com.atlassian.jira.event.type.EventDispatchOption
-import com.atlassian.jira.issue.MutableIssue
 import com.atlassian.jira.bc.issue.IssueService
 import com.atlassian.jira.issue.IssueInputParametersImpl
 
