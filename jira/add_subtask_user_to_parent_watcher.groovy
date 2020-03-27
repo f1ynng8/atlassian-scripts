@@ -1,4 +1,4 @@
- import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.component.ComponentAccessor
 import com.atlassian.jira.issue.Issue
 import com.atlassian.jira.issue.fields.CustomField
 import com.atlassian.jira.user.ApplicationUser
