@@ -9,3 +9,7 @@ else return 1;
 if(cfValues['直接移交给开发人员'].getValue() == '是') 
     return (cfValues['Sprint'] != null)
 else return 1;
+
+issue.getSummary().contains("测试用例")
+
+["Story","Bug"].contains(issue.parentObject?.issueType.name)
