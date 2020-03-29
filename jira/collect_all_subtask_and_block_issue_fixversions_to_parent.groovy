@@ -11,7 +11,7 @@ import com.atlassian.jira.event.type.EventDispatchOption
 def versionManager = ComponentAccessor.getVersionManager()
 def projectManager = ComponentAccessor.getProjectManager()
 def issueManager = ComponentAccessor.getIssueManager()
-def issueLinkManager = ComponentAccessor.getIssueLinkManager()
+//def issueLinkManager = ComponentAccessor.getIssueLinkManager()
 //def issue1 = issueManager.getIssueObject("NGP-181")
 
 def parentIssueVersions = issue.getFixVersions()
@@ -20,8 +20,20 @@ def parentIssueVersions = issue.getFixVersions()
 
 issueLinkManager.getOutwardLinks(issue.getId()).each {eachLink ->
     if (eachLink.getIssueLinkType().getName() == "jira_subtask_link") {
-        Issue epicLinkedIssue = eachLink.getDestinationObject()
-        Collection eachIssueVersions = epicLinkedIssue.getFixVersions();
+        Issue subtaskIssue = eachLink.getDestinationObject()
+        Collection eachIssueVersions = subtaskIssue.getFixVersions();
+        for (Version version: eachIssueVersions){
+            //issue.setFixVersions(Arrays.asList(version))
+            parentIssueVersions.add(version)
+            //log.warn(version.getName())
+        }
+    }
+}
+
+issueLinkManager.getInwardLinks(issue.getId()).each {eachLink ->
+    if (eachLink.getIssueLinkType().getName() == "Blocks") {
+        Issue blockLinkedIssue = eachLink.getSourceObject()
+        Collection eachIssueVersions = blockLinkedIssue.getFixVersions();
         for (Version version: eachIssueVersions){
             //issue.setFixVersions(Arrays.asList(version))
             parentIssueVersions.add(version)
