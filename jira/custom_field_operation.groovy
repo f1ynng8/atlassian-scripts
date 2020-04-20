@@ -13,3 +13,8 @@ else return 1;
 issue.getSummary().contains("测试用例")
 
 ["Story","Bug"].contains(issue.parentObject?.issueType.name)
+
+import com.atlassian.jira.component.ComponentAccessor
+
+def groupManager = ComponentAccessor.getGroupManager()
+groupManager.isUserInGroup(cfValues['验收人'], 'jira-administrators') || cfValues['验收人'] == null || (cfValues['验收人'] == issue.getProjectObject().getProjectLead())||(cfValues['验收人'] == cfValues['设计人'])||(cfValues['验收人'] == cfValues['测试人'])
