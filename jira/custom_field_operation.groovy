@@ -18,3 +18,8 @@ import com.atlassian.jira.component.ComponentAccessor
 
 def groupManager = ComponentAccessor.getGroupManager()
 groupManager.isUserInGroup(cfValues['验收人'], 'jira-administrators') || cfValues['验收人'] == null || (cfValues['验收人'] == issue.getProjectObject().getProjectLead())||(cfValues['验收人'] == cfValues['设计人'])||(cfValues['验收人'] == cfValues['测试人'])
+
+if(issue.getSummary().contains("测试用例") || issue.getSummary().contains("完成需求设计宣讲"))
+	return 1
+else
+	return issue.fixVersions.size()
