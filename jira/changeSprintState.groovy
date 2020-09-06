@@ -1,4 +1,3 @@
-//for Script Console
 import com.atlassian.jira.issue.Issue
 import com.atlassian.jira.issue.IssueManager
 import com.atlassian.jira.issue.CustomFieldManager
@@ -17,23 +16,34 @@ IssueService issueService = ComponentAccessor.getIssueService()
 def issueManager = ComponentAccessor.getIssueManager()
 def systemUser = ComponentAccessor.userManager.getUserByName("system")
 
-def mutableIssue = issueManager.getIssueObject("NGP-922")
+def mutableIssue = issue
+//def mutableIssue = issueManager.getIssueObject("NGP-922")
 
 def customFieldManager = ComponentAccessor.getCustomFieldManager()
-//def issueManager1 = ComponentAccessor.getIssueManager()
-//def optionsManager = ComponentAccessor.getOptionsManager()
+def issueManager1 = ComponentAccessor.getIssueManager()
+def optionsManager = ComponentAccessor.getOptionsManager()
 
 Collection cfs = customFieldManager.getCustomFieldObjectsByName("Sprint")
 CustomField cf = cfs[0]
-def sprints = mutableIssue.getCustomFieldValue(cf) as List <Sprint>
+def sprints = mutableIssue.getCustomFieldValue(cf) as Collection <Sprint>
 
-Integer sprintIsFuture = 0    
+for (Sprint s in sprints)
+{
+    updateSprintState(s, Sprint.State.CLOSED) //Sprint.State.ACTIVE, Sprint.State.CLOSED 
+}
 
+@WithPlugin("com.pyxis.greenhopper.jira")
+def sprintServiceOutcome = PluginModuleCompilationCustomiser.getGreenHopperBean(SprintManager).getAllSprints()
 
-for (Sprint s in sprints){
-    log.warn(s.name+s.state)
-    if (s.state.toString() == "ACTIVE"){
-        sprintIsFuture = sprintIsFuture + 1
+def updateSprintState(Sprint sprint, Sprint.State state) {
+
+    def sprintManager = PluginModuleCompilationCustomiser.getGreenHopperBean(SprintManager)
+    def newSprint = sprint.builder(sprint).state(state).build()
+    def outcome = sprintManager.updateSprint(newSprint)
+
+    if (outcome.isInvalid()) {
+        log.debug "Could not update sprint with name ${sprint.name}, ${outcome.getErrors()}"
+    } else {
+        log.debug "${sprint.name} updated."
     }
 }
-return sprintIsFuture
